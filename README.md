@@ -2,7 +2,7 @@
 
 > One dashboard, six products, single Cloudflare-native data plane. The platform every other product in my portfolio reports into.
 
-🌐 **Live:** [ops.tbot.trade](https://ops.tbot.trade)
+🌐 **Live:** ops.tbot.trade *(behind Cloudflare Access — operator only; see screenshots below)*
 🏗️ **Stack:** Cloudflare D1 + Workers + Pages + Email Routing + Resend
 🔒 **Source:** private — this README + screenshots are the showcase
 
