@@ -17,12 +17,12 @@ The Unified Ops Dashboard is a single web app that ingests events from every pro
 ## Architecture
 
 ```
-                   ┌──── T BOT (trading) ────────┐
+                   ┌──── T BOT (trading) ───────┐
                    ├──── CPR  (Canadian PR)  ───┤
-   six products ──┤──── LBB  (Lean Body)    ───┼─→  POST /ingest  (HMAC-signed)
+   six products ── ┤──── LBB  (Lean Body)    ───┼─→  POST /ingest  (HMAC-signed)
                    ├──── RBP  (Reinvention)  ───┤         │
                    ├──── Maasai (YouTube)    ───┤         ▼
-                   └──── Resend webhooks     ───┘    ┌─────────────────────┐
+                   └──── Resend webhooks     ───┘   ┌─────────────────────┐
                                                     │  ingest-worker      │
                                                     │  (Cloudflare Worker)│
                                                     └──────────┬──────────┘
