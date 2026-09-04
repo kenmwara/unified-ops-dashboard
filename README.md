@@ -8,6 +8,16 @@
 
 ---
 
+## Screenshots
+
+<p>
+  <img src="https://tbot.trade/portfolio/img/ops.jpg" width="400" alt="ops.tbot.trade — fleet overview: health pills, flags, scheduler queue, one tile per product, per-project System health cards">
+  &nbsp;&nbsp;
+  <img src="https://tbot.trade/portfolio/img/ops-money.jpg" width="400" alt="ops.tbot.trade — Money & funnels: one revenue card per surface; deposits are never P&L">
+</p>
+
+*Left — the fleet overview behind Cloudflare Access: health pills, flags, the scheduler queue, one tile per product, then per-project System health cards. Right — Money & funnels: one revenue card per surface, one owner per fact, deposits never counted as P&L.*
+
 ## What this is
 
 Six products. Each generating different event types — Stripe charges, Resend opens, T BOT trade fills, YouTube views, lead form submissions, Kalshi resolutions. Before this dashboard existed, I had six tabs open and no idea which product was actually working in any given week.
