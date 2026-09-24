@@ -1,6 +1,6 @@
 # Unified Ops Dashboard
 
-> One dashboard, six products, single Cloudflare-native data plane. The platform every other product in my portfolio reports into.
+> One dashboard, every product, a single Cloudflare-native data plane. The platform every other product in my portfolio reports into.
 
 🌐 **Live:** ops.tbot.trade *(behind Cloudflare Access — operator only; see screenshots below)*
 🏗️ **Stack:** Cloudflare D1 + Workers + Pages + Email Routing + Resend
@@ -20,7 +20,7 @@
 
 ## What this is
 
-Six products. Each generating different event types — Stripe charges, Resend opens, T BOT trade fills, YouTube views, lead form submissions, Kalshi resolutions. Before this dashboard existed, I had six tabs open and no idea which product was actually working in any given week.
+Every product generates different event types — Stripe charges, Resend opens, T BOT trade fills, YouTube views, lead form submissions, Kalshi resolutions. Before this dashboard existed, I had a tab open per product and no idea which product was actually working in any given week.
 
 The Unified Ops Dashboard is a single web app that ingests events from every product, stores them in one D1 table, and renders unified rollups: 7-day revenue, leads, email opens, T BOT P&L, per-funnel conversion. One screen, full picture.
 
@@ -29,7 +29,7 @@ The Unified Ops Dashboard is a single web app that ingests events from every pro
 ```
                    ┌──── T BOT (trading) ───────┐
                    ├──── CPR  (Canadian PR)  ───┤
-   six products ── ┤──── LBB  (Lean Body)    ───┼─→  POST /ingest  (HMAC-signed)
+  every product ── ┤──── LBB  (Lean Body)    ───┼─→  POST /ingest  (HMAC-signed)
                    ├──── RBP  (Reinvention)  ───┤         │
                    ├──── Maasai (YouTube)    ───┤         ▼
                    └──── Resend webhooks     ───┘   ┌─────────────────────┐
@@ -77,7 +77,7 @@ CREATE TABLE events (
 CREATE UNIQUE INDEX idx_dedup ON events(project, source_id);
 ```
 
-Schema is intentionally minimal. Every product writes through the same shape. The `metadata` JSON blob absorbs all per-product variation without requiring schema changes. **Six products. One schema. Zero migrations in production.**
+Schema is intentionally minimal. Every product writes through the same shape. The `metadata` JSON blob absorbs all per-product variation without requiring schema changes. **Every product. One schema. Zero migrations in production.**
 
 ### 2. HMAC-signed ingest, separate write/read workers
 
@@ -96,9 +96,9 @@ Events are never updated, never deleted. Corrections are new events. Total sourc
 | Database | D1 (SQLite at the edge) |
 | Static site | Pages (the dashboard itself) |
 | Webhooks in | Email Routing → ingest worker (e.g. Resend opens) |
-| Auth (later) | Cloudflare Access |
+| Auth | Cloudflare Access |
 
-**One vendor. One CLI (`wrangler`). One bill. Operational simplicity at six-product scale beats best-of-breed sprawl for a solo operator.**
+**One vendor. One CLI (`wrangler`). One bill. Operational simplicity at multi-product scale beats best-of-breed sprawl for a solo operator.**
 
 ## What you see on the dashboard
 
@@ -123,16 +123,25 @@ Events are never updated, never deleted. Corrections are new events. Total sourc
 - **Deduplication of webhook deliveries.** Resend retries; Stripe retries; my own product retries. Solved with the `(project, source_id)` unique index — duplicate POSTs are silent no-ops.
 - **One database, many consumers.** Solved by splitting write (ingest) and read (read-api) into separate workers with different D1 bindings. The read-api can be rate-limited or cached aggressively without affecting ingestion.
 
+## Security operations on the same event store
+
+The same append-only table is also T BOT's SIEM. Intrusion detection on the trading server, audit trails from both APIs, and the exchange-side reconciliation that catches a misused API key all write security events into it, and a separate SOAR page on the dashboard turns them into a verdict, a timeline and six response playbooks. The full write-up, with screenshots: **[kenmwara/tbot-security](https://github.com/kenmwara/tbot-security)**.
+
+<p>
+  <a href="https://github.com/kenmwara/tbot-security"><img src="https://raw.githubusercontent.com/kenmwara/tbot-security/main/docs/soar-desktop.png" width="400" alt="The SOAR page in demo mode: posture tiles, an incident timeline, the event feed and response playbooks"></a>
+</p>
+
+*The SOAR page in its synthetic demo mode. The live page sits behind Cloudflare Access.*
+
 ## What I'd build next
 
-1. **Cloudflare Access in front of `/api/events` and the dashboard** (currently in front but ingest stays public-with-HMAC)
-2. **Alerting** — daily summary email via Resend when revenue drops more than X% week-over-week
-3. **Per-product P&L view** with attribution (which ad campaign drove which lead drove which purchase)
-4. **OpenTelemetry-style trace IDs** across products → dashboard, so a `lead → email_open → clicked → purchased` chain is visible as a single timeline
+1. **Revenue alerting** — a summary when revenue drops more than X% week-over-week (security alerting already pages on Telegram)
+2. **Per-product P&L view** with attribution (which ad campaign drove which lead drove which purchase)
+3. **OpenTelemetry-style trace IDs** across products → dashboard, so a `lead → email_open → clicked → purchased` chain is visible as a single timeline
 
 ## Why this is interesting
 
-Most "ops dashboards" are bolted onto a single product. This one ingests from six. The trick wasn't the dashboard — it was deciding to ingest *into one D1 table* instead of running per-product analytics stacks. That decision means every new product I ship gets dashboard support by writing one HTTP call instead of standing up new infrastructure.
+Most "ops dashboards" are bolted onto a single product. This one ingests from every product I run. The trick wasn't the dashboard — it was deciding to ingest *into one D1 table* instead of running per-product analytics stacks. That decision means every new product I ship gets dashboard support by writing one HTTP call instead of standing up new infrastructure.
 
 It's the most leverage I've ever gotten out of 200 lines of Cloudflare Workers code.
 
