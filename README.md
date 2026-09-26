@@ -20,7 +20,7 @@
 
 ## What this is
 
-Every product generates different event types — Stripe charges, Resend opens, T BOT trade fills, YouTube views, lead form submissions, Kalshi resolutions. Before this dashboard existed, I had a tab open per product and no idea which product was actually working in any given week.
+Every product generates different event types — Stripe charges, Resend opens, T BOT trade fills, YouTube views, lead form submissions, market settlements. Before this dashboard existed, I had a tab open per product and no idea which product was actually working in any given week.
 
 The Unified Ops Dashboard is a single web app that ingests events from every product, stores them in one D1 table, and renders unified rollups: 7-day revenue, leads, email opens, T BOT P&L, per-funnel conversion. One screen, full picture.
 
