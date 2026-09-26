@@ -98,7 +98,7 @@ Events are never updated, never deleted. Corrections are new events. Total sourc
 | Webhooks in | Email Routing → ingest worker (e.g. Resend opens) |
 | Auth | Cloudflare Access |
 
-**One vendor. One CLI (`wrangler`). One bill. Operational simplicity at multi-product scale beats best-of-breed sprawl for a solo operator.**
+**One vendor. One CLI (`wrangler`). One bill. Operational simplicity at multi-product scale beats best-of-breed sprawl for a small team.**
 
 ## What you see on the dashboard
 
