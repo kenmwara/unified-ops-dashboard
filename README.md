@@ -129,9 +129,11 @@ The same append-only table is also T BOT's SIEM. Intrusion detection on the trad
 
 <p>
   <a href="https://github.com/kenmwara/tbot-security"><img src="https://raw.githubusercontent.com/kenmwara/tbot-security/main/docs/soar-desktop.png" width="400" alt="The SOAR page in demo mode: posture tiles, an incident timeline, the event feed and response playbooks"></a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/kenmwara/tbot-security"><img src="https://raw.githubusercontent.com/kenmwara/tbot-security/main/docs/soar-map.png" width="400" alt="SOAR attack map: 24 hours of traffic the server refused, by country, with the SSH, firewall, web and fail2ban split and the top network per country (real counts, no addresses)"></a>
 </p>
 
-*The SOAR page in its synthetic demo mode. The live page sits behind Cloudflare Access.*
+*Left: the SOAR page in its synthetic demo mode. Right: its attack map with real counts (countries only, no addresses). The live page sits behind Cloudflare Access.*
 
 ## What I'd build next
 
