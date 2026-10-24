@@ -1,4 +1,4 @@
-<!-- banner --><a href="https://github.com/kenmwara"><img src="https://raw.githubusercontent.com/kenmwara/kenmwara/main/assets/brand/card-ops.png?v=c89c0e06" width="100%" alt="Unified Ops Dashboard: One dashboard every product reports into: an append-only event store on Cloudflare D1, Workers and Pages. LIVE behind Cloudflare Access."></a>
+<!-- banner --><a href="https://github.com/kenmwara"><img src="https://raw.githubusercontent.com/kenmwara/kenmwara/main/assets/brand/card-ops.png?v=ea77cc79" width="100%" alt="Unified Ops Dashboard: One dashboard every product reports into: an append-only event store on Cloudflare D1, Workers and Pages. LIVE behind Cloudflare Access."></a>
 
 # Unified Ops Dashboard
 
