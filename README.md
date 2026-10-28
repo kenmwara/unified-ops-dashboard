@@ -28,37 +28,8 @@ The Unified Ops Dashboard is a single web app that ingests events from every pro
 
 ## Architecture
 
-```
-                   ┌──── T BOT (trading) ───────┐
-                   ├──── CPR  (Canadian PR)  ───┤
-  every product ── ┤──── LBB  (Lean Body)    ───┼─→  POST /ingest  (HMAC-signed)
-                   ├──── RBP  (Reinvention)  ───┤         │
-                   ├──── Maasai (YouTube)    ───┤         ▼
-                   └──── Resend webhooks     ───┘   ┌─────────────────────┐
-                                                    │  ingest-worker      │
-                                                    │  (Cloudflare Worker)│
-                                                    └──────────┬──────────┘
-                                                               │
-                                                               ▼
-                                                    ┌─────────────────────┐
-                                                    │  D1: unified-events │
-                                                    │  ONE table, never   │
-                                                    │  to be migrated.    │
-                                                    └──────────┬──────────┘
-                                                               │
-                                                               ▼
-                                                    ┌─────────────────────┐
-                                                    │  read-api worker    │
-                                                    │  GET /api/events    │
-                                                    │  GET /api/stats     │
-                                                    └──────────┬──────────┘
-                                                               │
-                                                               ▼
-                                                    ┌─────────────────────┐
-                                                    │  Pages site         │
-                                                    │  ops.tbot.trade     │
-                                                    └─────────────────────┘
-```
+
+<img src="images/architecture.png" width="100%" alt="Architecture diagram of the Unified Ops Dashboard. Products (T BOT, Canadian PR Mastery, Lean Body Blueprint, Reinvention Blueprint, JobScout, the web studio), webhooks (Stripe, signature-checked; Resend; Tally) and support email via Cloudflare Email Routing write to one Cloudflare ingest worker. Guard 1: the project comes from each product's own secret, never the body; Stripe needs an HMAC signature within a 5-minute window; every body is schema-validated. Guard 2: events land in one append-only D1 table, unified-events, de-duplicated on project and source id and never migrated in production; it is also T BOT's SIEM. The ops-read-api serves events, stats, incidents with a daily sweep, address reputation and Ask the SOAR, where Claude plans a search from an allow-list and never writes SQL. Guard 3: ops.tbot.trade on Pages sits behind Cloudflare Access with its default hostname redirected. Dev twins run on their own D1 with no routes or crons; GitHub runs the typecheck and the rule, schema and hunt checks before every deploy.">
 
 ## Key design decisions
 
@@ -81,9 +52,9 @@ CREATE UNIQUE INDEX idx_dedup ON events(project, source_id);
 
 Schema is intentionally minimal. Every product writes through the same shape. The `metadata` JSON blob absorbs all per-product variation without requiring schema changes. **Every product. One schema. Zero migrations in production.**
 
-### 2. HMAC-signed ingest, separate write/read workers
+### 2. Per-project ingest secrets, signed webhooks, separate write/read workers
 
-Each product holds a per-project secret. POST `/ingest` rejects requests without matching `x-project-secret`. The ingest worker has D1 write permission; the read-api worker has D1 read-only — failure on one doesn't compromise the other.
+Each product holds a per-project secret. POST `/ingest` rejects requests without matching `x-project-secret`. Stripe webhooks must also carry a valid HMAC signature inside a 5-minute window. Writing events goes through the ingest worker only; the read API serves the dashboard behind Cloudflare Access, so a failure on one side doesn't take down the other.
 
 ### 3. Append-only by design
 
