@@ -14,13 +14,7 @@
 
 ## Screenshots
 
-<p>
-  <img src="https://tbot.trade/portfolio/img/ops.jpg" width="400" alt="ops.tbot.trade — fleet overview: health pills, flags, scheduler queue, one tile per product, per-project System health cards">
-  &nbsp;&nbsp;
-  <img src="https://tbot.trade/portfolio/img/ops-money.jpg" width="400" alt="ops.tbot.trade — Money & funnels: one revenue card per surface; deposits are never P&L">
-</p>
-
-*Left — the fleet overview behind Cloudflare Access: health pills, flags, the scheduler queue, one tile per product, then per-project System health cards. Right — Money & funnels: one revenue card per surface, one owner per fact, deposits never counted as P&L.*
+<img src="images/ops-screens.png" width="100%" alt="Every product on one screen, and the money in one place. Fleet overview: Status pills, flags, the job queue, one tile per product, then each product's health. Money & funnels: One revenue card per product. Deposits are never counted as profit.">
 
 ## What this is
 
@@ -98,15 +92,9 @@ Events are never updated, never deleted. Corrections are new events. Total sourc
 
 ## Security operations on the same event store
 
-The same append-only table is also T BOT's SIEM. Intrusion detection on the trading server, audit trails from both APIs, and the exchange-side reconciliation that catches a misused API key all write security events into it, and a separate SOAR page on the dashboard turns them into a verdict, a timeline and six response playbooks. The full write-up, with screenshots: **[kenmwara/tbot-security](https://github.com/kenmwara/tbot-security)**.
+The same table, which can't be edited, is also T BOT's security log (SIEM). Intrusion detection on the trading server, audit trails from both APIs, and the exchange-side reconciliation that catches a misused API key all write security events into it, and a separate SOAR page on the dashboard turns them into a verdict, a timeline and six response playbooks. The full write-up, with screenshots: **[kenmwara/tbot-security](https://github.com/kenmwara/tbot-security)**.
 
-<p>
-  <a href="https://github.com/kenmwara/tbot-security"><img src="https://raw.githubusercontent.com/kenmwara/tbot-security/main/docs/soar-desktop.png" width="400" alt="The SOAR page in demo mode: posture tiles, an incident timeline, the event feed and response playbooks"></a>
-  &nbsp;&nbsp;
-  <a href="https://github.com/kenmwara/tbot-security"><img src="https://raw.githubusercontent.com/kenmwara/tbot-security/main/docs/soar-map.png" width="400" alt="SOAR attack map: 24 hours of traffic the server refused, by country, with the SSH, firewall, web and fail2ban split and the top network per country (real counts, no addresses)"></a>
-</p>
-
-*Left: the SOAR page in its synthetic demo mode. Right: its attack map with real counts (countries only, no addresses). The live page sits behind Cloudflare Access.*
+<a href="https://github.com/kenmwara/tbot-security"><img src="https://raw.githubusercontent.com/kenmwara/tbot-security/main/images/tsec-console.png" width="100%" alt="The response console, shown with made-up demo data. Every address, email and event here is invented, from ranges reserved for examples. The live page shows the same views with real data, behind a sign-in. Incidents: Related warnings grouped into one incident: open, acknowledged or resolved, with a button to ban an address. Live logs: Login, firewall and web logs streaming in, newest first, with filters and search. Overview: Health tiles, a seven-day timeline, the event feed and six ready-made responses. On a phone: The verdict and health tiles come first."></a>
 
 ## Planned enhancements
 
