@@ -1,8 +1,8 @@
-<!-- banner --><a href="https://github.com/kenmwara"><img src="https://raw.githubusercontent.com/kenmwara/kenmwara/main/assets/brand/card-ops.png?v=ea77cc79" width="100%" alt="Unified Ops Dashboard: One dashboard every product reports into: an append-only event store on Cloudflare D1, Workers and Pages. LIVE behind Cloudflare Access."></a>
+<!-- banner --><a href="https://github.com/kenmwara"><img src="https://raw.githubusercontent.com/kenmwara/kenmwara/main/assets/brand/card-ops.png?v=2286bde9" width="100%" alt="Unified Ops Dashboard: One dashboard every product reports into: an append-only event store on Cloudflare D1, Workers and Pages. LIVE behind Cloudflare Access."></a>
 
 # Unified Ops Dashboard
 
-> One dashboard, every product, a single Cloudflare-native data plane. The platform every other product in my portfolio reports into.
+> One dashboard, every product, a single Cloudflare-native data plane. The platform every other product in the portfolio reports into.
 
 🌐 **Live:** ops.tbot.trade *(behind Cloudflare Access — operator only; see screenshots below)*
 🏗️ **Stack:** Cloudflare D1 + Workers + Pages + Email Routing + Resend
@@ -22,7 +22,7 @@
 
 ## What this is
 
-Every product generates different event types — Stripe charges, Resend opens, T BOT trade fills, YouTube views, lead form submissions, market settlements. Before this dashboard existed, I had a tab open per product and no idea which product was actually working in any given week.
+Every product generates different event types — Stripe charges, Resend opens, T BOT trade fills, YouTube views, lead form submissions, market settlements. Before consolidation, each product was monitored in its own console, with no single view of which product was performing in a given week.
 
 The Unified Ops Dashboard is a single web app that ingests events from every product, stores them in one D1 table, and renders unified rollups: 7-day revenue, leads, email opens, T BOT P&L, per-funnel conversion. One screen, full picture.
 
@@ -93,7 +93,7 @@ Events are never updated, never deleted. Corrections are new events. Total sourc
 ## What was hard
 
 - **Event-shape ambiguity across products.** "What counts as a lead?" was different per product. Solved by keeping the `event_type` enum small (~6 values) and pushing all per-product specifics into the `metadata` JSON.
-- **Deduplication of webhook deliveries.** Resend retries; Stripe retries; my own product retries. Solved with the `(project, source_id)` unique index — duplicate POSTs are silent no-ops.
+- **Deduplication of webhook deliveries.** Resend, Stripe and the internal products all retry. Solved with the `(project, source_id)` unique index — duplicate POSTs are silent no-ops.
 - **One database, many consumers.** Solved by splitting write (ingest) and read (read-api) into separate workers with different D1 bindings. The read-api can be rate-limited or cached aggressively without affecting ingestion.
 
 ## Security operations on the same event store
@@ -108,18 +108,18 @@ The same append-only table is also T BOT's SIEM. Intrusion detection on the trad
 
 *Left: the SOAR page in its synthetic demo mode. Right: its attack map with real counts (countries only, no addresses). The live page sits behind Cloudflare Access.*
 
-## What I'd build next
+## Planned enhancements
 
 1. **Revenue alerting** — a summary when revenue drops more than X% week-over-week (security alerting already pages on Telegram)
 2. **Per-product P&L view** with attribution (which ad campaign drove which lead drove which purchase)
 3. **OpenTelemetry-style trace IDs** across products → dashboard, so a `lead → email_open → clicked → purchased` chain is visible as a single timeline
 
-## Why this is interesting
+## Design rationale
 
-Most "ops dashboards" are bolted onto a single product. This one ingests from every product I run. The trick wasn't the dashboard — it was deciding to ingest *into one D1 table* instead of running per-product analytics stacks. That decision means every new product I ship gets dashboard support by writing one HTTP call instead of standing up new infrastructure.
-
-It's the most leverage I've ever gotten out of 200 lines of Cloudflare Workers code.
+Most operations dashboards are attached to a single product. This platform ingests from every product into *one D1
+table* instead of running per-product analytics stacks, so onboarding a new product requires one HTTP call rather than
+new infrastructure. The ingest and read path is approximately 200 lines of Cloudflare Workers code.
 
 ---
 
-*Source code is private. The architecture, schema, and operational reasoning above are the showcase. If you'd like to discuss the design decisions, [hit me up](https://linkedin.com/in/kenmwara).*
+*Source code is private. The architecture, schema, and operational reasoning above are the showcase. Design discussions: [LinkedIn](https://linkedin.com/in/kenmwara).*
