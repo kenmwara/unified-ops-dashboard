@@ -2,7 +2,7 @@
 
 # Unified Ops Dashboard
 
-> One dashboard, every product, a single Cloudflare-native data plane. The platform every other product in the portfolio reports into.
+> One dashboard for every product: sales, sign-ups, replies and errors from each app land in one place, so it's easy to see what's working each week.
 
 🌐 **Live:** ops.tbot.trade *(behind Cloudflare Access — operator only; see screenshots below)*
 🏗️ **Stack:** Cloudflare D1 + Workers + Pages + Email Routing + Resend
