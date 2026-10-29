@@ -58,6 +58,10 @@ Events are never updated, never deleted. Corrections are new events. Total sourc
 
 ### 4. Cloudflare-native end to end
 
+<img src="images/ops-cloudflare.png" width="100%" alt="Everything runs on Cloudflare, one account and one bill. One vendor and one command-line tool keep a multi-product platform simple for a small team. The domain: tbot.trade and its DNS records. The two small programs: Cloudflare Workers: one takes events in, one serves the dashboard's data. The database: Cloudflare D1, a small SQL database at the edge. The dashboard itself: Cloudflare Pages, a plain static site. Email in: Cloudflare Email Routing passes emails (like Resend's email-open reports) to the intake program. Who can see it: Cloudflare Access: a sign-in in front of every page.">
+
+<details><summary>The services as a table</summary>
+
 | Concern | Cloudflare service |
 |---|---|
 | Domain + DNS | `tbot.trade` zone |
@@ -66,6 +70,8 @@ Events are never updated, never deleted. Corrections are new events. Total sourc
 | Static site | Pages (the dashboard itself) |
 | Webhooks in | Email Routing → ingest worker (e.g. Resend opens) |
 | Auth | Cloudflare Access |
+
+</details>
 
 **One vendor. One CLI (`wrangler`). One bill. Operational simplicity at multi-product scale beats best-of-breed sprawl for a small team.**
 
