@@ -10,7 +10,7 @@
 
 ---
 
-<img src="images/flow.png" width="100%" alt="Flow diagram in five steps. 1: Products send events; Sales, leads, replies and system events from every product, plus webhooks and email. 2: Ingest worker checks them; Project taken from the secret, never the body; Stripe HMAC; schema validation. 3: Stored append-only; One Cloudflare D1 table, de-duplicated on project + source ID. 4: Read API summarises; Stats, the incident timeline, address reputation, Ask the SOAR. 5: Operators see and act; ops.tbot.trade behind Cloudflare Access; alerts to Telegram. Guards: Write side, only a product's own secret writes its events; Integrity, nothing is edited after the fact; Read side, every page requires a sign-in.">
+<img src="images/flow.png" width="100%" alt="How it works, in five steps. 1. Products send updates: Sales, sign-ups, replies and errors from every product. 2. Each update is checked: It must carry the right product's key, and payments must be signed. 3. Stored once, never edited: One database; duplicates are dropped. 4. Summaries are built: Totals, a timeline of incidents, and questions you can ask in plain English. 5. The owner sees it all: A private dashboard behind a login wall; alerts to a phone. Safeguards: Who can write: Only a product with its own key can send updates; Trust: Nothing is changed after the fact; Who can read: Every page needs a sign-in.">
 
 ## Screenshots
 
