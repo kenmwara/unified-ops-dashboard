@@ -31,7 +31,7 @@ The Unified Ops Dashboard is a single web app that ingests events from every pro
 ## Architecture
 
 
-<img src="images/architecture.png" width="100%" alt="Architecture diagram of the Unified Ops Dashboard. Products (T BOT, Canadian PR Mastery, Lean Body Blueprint, Reinvention Blueprint, JobScout, the web studio), webhooks (Stripe, signature-checked; Resend; Tally) and support email via Cloudflare Email Routing write to one Cloudflare ingest worker. Guard 1: the project comes from each product's own secret, never the body; Stripe needs an HMAC signature within a 5-minute window; every body is schema-validated. Guard 2: events land in one append-only D1 table, unified-events, de-duplicated on project and source id and never migrated in production; it is also T BOT's SIEM. The ops-read-api serves events, stats, incidents with a daily sweep, address reputation and Ask the SOAR, where Claude plans a search from an allow-list and never writes SQL. Guard 3: ops.tbot.trade on Pages sits behind Cloudflare Access with its default hostname redirected. Dev twins run on their own D1 with no routes or crons; GitHub runs the typecheck and the rule, schema and hunt checks before every deploy.">
+<img src="images/architecture.png" width="100%" alt="Architecture diagram of the Unified Ops Dashboard. Products (T BOT, Canadian PR Mastery, Lean Body Blueprint, Reinvention Blueprint, JobScout, the web studio), webhooks (Stripe, signature-checked; Resend; Tally) and support email via Cloudflare Email Routing write to one Cloudflare ingest worker. Guard 1: the project comes from each product's own secret, never the body; Stripe needs an HMAC signature within a 5-minute window; every body is schema-validated. Guard 2: events land in one can't-be-edited D1 table, unified-events, de-duplicated on project and source id and never migrated in production; it is also T BOT's SIEM. The ops-read-api serves events, stats, incidents with a daily sweep, address reputation and Ask the SOAR, where Claude plans a search from an allow-list and never writes SQL. Guard 3: ops.tbot.trade on Pages sits behind Cloudflare Access with its default hostname redirected. Dev twins run on their own D1 with no routes or crons; GitHub runs the typecheck and the rule, schema and hunt checks before every deploy.">
 
 ## Key design decisions
 
@@ -77,8 +77,6 @@ Events are never updated, never deleted. Corrections are new events. Total sourc
 
 ## What you see on the dashboard
 
-*(screenshots)*
-
 - **Headline cards:** 7-day revenue · 7-day leads · 7-day email opens · T BOT 7-day P&L
 - **Per-project rollups:** CPR conversion funnel (leads → opened → clicked → purchased), RBP audience growth, T BOT win-rate trend, LBB sales velocity
 - **Event stream:** chronological log of every event across all products, filterable by project and type
@@ -86,7 +84,7 @@ Events are never updated, never deleted. Corrections are new events. Total sourc
 
 ## Tech stack details
 
-- **Workers:** TypeScript, ~150 lines per worker, Zod for schema validation
+- **Workers:** TypeScript, with every incoming event checked against a fixed format (Zod)
 - **D1:** Single migration (`0001_events.sql`), never altered in production
 - **Pages:** vanilla HTML/CSS/JS (no framework — render is fast and the markup is auditable)
 - **Email webhook bridges:** Cloudflare Email Routing → custom address → Worker that parses Resend digest emails into events
@@ -112,7 +110,7 @@ The same append-only table is also T BOT's SIEM. Intrusion detection on the trad
 
 ## Planned enhancements
 
-1. **Revenue alerting** — a summary when revenue drops more than X% week-over-week (security alerting already pages on Telegram)
+1. **Revenue alerting** — a summary when revenue drops sharply from one week to the next (security alerting already pages on Telegram)
 2. **Per-product P&L view** with attribution (which ad campaign drove which lead drove which purchase)
 3. **OpenTelemetry-style trace IDs** across products → dashboard, so a `lead → email_open → clicked → purchased` chain is visible as a single timeline
 
@@ -120,7 +118,7 @@ The same append-only table is also T BOT's SIEM. Intrusion detection on the trad
 
 Most operations dashboards are attached to a single product. This platform ingests from every product into *one D1
 table* instead of running per-product analytics stacks, so onboarding a new product requires one HTTP call rather than
-new infrastructure. The ingest and read path is approximately 200 lines of Cloudflare Workers code.
+new infrastructure. Writing and reading run as two small Cloudflare Workers.
 
 ---
 
