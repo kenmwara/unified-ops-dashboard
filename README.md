@@ -1,4 +1,4 @@
-<!-- banner --><a href="https://github.com/kenmwara"><img src="https://raw.githubusercontent.com/kenmwara/kenmwara/main/assets/brand/card-ops.png?v=2286bde9" width="100%" alt="Unified Ops Dashboard: One dashboard every product reports into: an append-only event store on Cloudflare D1, Workers and Pages. LIVE behind Cloudflare Access."></a>
+<!-- banner --><a href="https://github.com/kenmwara"><img src="https://raw.githubusercontent.com/kenmwara/kenmwara/main/assets/brand/card-ops.png?v=065bf63b" width="100%" alt="Unified Ops Dashboard: One dashboard every product reports into: an append-only event store on Cloudflare D1, Workers and Pages. LIVE behind Cloudflare Access."></a>
 
 # Unified Ops Dashboard
 
@@ -9,6 +9,8 @@
 🔒 **Source:** private — this README + screenshots are the showcase
 
 ---
+
+<img src="images/flow.png" width="100%" alt="Flow diagram in five steps. 1: Products send events; Sales, leads, replies and system events from every product, plus webhooks and email. 2: Ingest worker checks them; Project taken from the secret, never the body; Stripe HMAC; schema validation. 3: Stored append-only; One Cloudflare D1 table, de-duplicated on project + source ID. 4: Read API summarises; Stats, the incident timeline, address reputation, Ask the SOAR. 5: Operators see and act; ops.tbot.trade behind Cloudflare Access; alerts to Telegram. Guards: Write side, only a product's own secret writes its events; Integrity, nothing is edited after the fact; Read side, every page requires a sign-in.">
 
 ## Screenshots
 
