@@ -5,12 +5,18 @@
 > One dashboard for every product: sales, sign-ups, replies and errors from each app land in one place, so it's easy to see what's working each week.
 
 🌐 **Live:** ops.tbot.trade *(behind Cloudflare Access — operator only; see screenshots below)*
-🏗️ **Stack:** Cloudflare D1 + Workers + Pages + Email Routing + Resend
+🏗️ **Stack:** Cloudflare D1 + Workers + Pages + Email Routing + Email Sending
 🔒 **Source:** private — this README + screenshots are the showcase
 
 ---
 
 <img src="images/flow.png" width="100%" alt="How it works, in five steps. 1. Products send updates: Sales, sign-ups, replies and errors from every product. 2. Each update is checked: It must carry the right product's key, and payments must be signed. 3. Stored once, never edited: One database; duplicates are dropped. 4. Summaries are built: Totals, a timeline of incidents, and questions you can ask in plain English. 5. The owner sees it all: A private dashboard behind a login wall; alerts to a phone. Safeguards: Who can write: Only a product with its own key can send updates; Trust: Nothing is changed after the fact; Who can read: Every page needs a sign-in.">
+
+## At a glance
+
+<img src="images/event-flow.png" width="100%" alt="Flow diagram of one update, from a product to the screen. A product sends an update: a sale, a sign-up, a reply or an error. It goes to the intake program, carrying that product's own secret key. Decision: does the key match a known product? No: turned away, nothing saved; the intake program is the only way into the database. Yes: the key decides which product it is, and the update cannot claim to be another. Decision: is the update in the right shape? No: turned away, with the problems listed; unknown kinds of update are refused. Yes: saved once, never edited, and a repeat of the same update is ignored. A phone alert goes out for each saved update, unless the product sent its own. The owner sees it on a private dashboard, behind a sign-in. Side notes: payments and forms arrive by their own doors, each signature-checked, and join at the same save; retries are safe, so a payment sent twice is still saved once.">
+
+<sub>Editable diagram: [images/event-flow.drawio](images/event-flow.drawio) (opens in diagrams.net).</sub>
 
 ## Screenshots
 
@@ -18,14 +24,14 @@
 
 ## What this is
 
-Every product generates different event types — Stripe charges, Resend opens, T BOT trade fills, YouTube views, lead form submissions, market settlements. Before consolidation, each product was monitored in its own console, with no single view of which product was performing in a given week.
+Every product generates different event types — Stripe charges, support emails, T BOT trade fills, YouTube views, lead form submissions, market settlements. Before consolidation, each product was monitored in its own console, with no single view of which product was performing in a given week.
 
 The Unified Ops Dashboard is a single web app that ingests events from every product, stores them in one D1 table, and renders unified rollups: 7-day revenue, leads, email opens, T BOT P&L, per-funnel conversion. One screen, full picture.
 
 ## Architecture
 
 
-<img src="images/architecture.png" width="100%" alt="Architecture diagram of the Unified Ops Dashboard. Products (T BOT, Canadian PR Mastery, Lean Body Blueprint, Reinvention Blueprint, JobScout, the web studio), webhooks (Stripe, signature-checked; Resend; Tally) and support email via Cloudflare Email Routing write to one Cloudflare ingest worker. Guard 1: the project comes from each product's own secret, never the body; Stripe needs an HMAC signature within a 5-minute window; every body is schema-validated. Guard 2: events land in one can't-be-edited D1 table, unified-events, de-duplicated on project and source id and never migrated in production; it is also T BOT's SIEM. The ops-read-api serves events, stats, incidents with a daily sweep, address reputation and Ask the SOAR, where Claude plans a search from an allow-list and never writes SQL. Guard 3: ops.tbot.trade on Pages sits behind Cloudflare Access with its default hostname redirected. Dev twins run on their own D1 with no routes or crons; GitHub runs the typecheck and the rule, schema and hunt checks before every deploy.">
+<img src="images/architecture.png" width="100%" alt="Architecture diagram of the Unified Ops Dashboard. Products (T BOT, Canadian PR Mastery, Lean Body Blueprint, Reinvention Blueprint, JobScout, the web studio), webhooks (Stripe, signature-checked; Tally) and support email via Cloudflare Email Routing write to one Cloudflare ingest worker. Guard 1: the project comes from each product's own secret, never the body; Stripe needs an HMAC signature within a 5-minute window; every body is schema-validated. Guard 2: events land in one can't-be-edited D1 table, unified-events, de-duplicated on project and source id and never migrated in production; it is also T BOT's SIEM. The ops-read-api serves events, stats, incidents with a daily sweep, address reputation and Ask the SOAR, where Claude plans a search from an allow-list and never writes SQL. Guard 3: ops.tbot.trade on Pages sits behind Cloudflare Access with its default hostname redirected. Dev twins run on their own D1 with no routes or crons; GitHub runs the typecheck and the rule, schema and hunt checks before every deploy.">
 
 ## Key design decisions
 
@@ -58,7 +64,7 @@ Events are never updated, never deleted. Corrections are new events. Total sourc
 
 ### 4. Cloudflare-native end to end
 
-<img src="images/ops-cloudflare.png" width="100%" alt="Everything runs on Cloudflare, one account and one bill. One vendor and one command-line tool keep a multi-product platform simple for a small team. The domain: tbot.trade and its DNS records. The two small programs: Cloudflare Workers: one takes events in, one serves the dashboard's data. The database: Cloudflare D1, a small SQL database at the edge. The dashboard itself: Cloudflare Pages, a plain static site. Email in: Cloudflare Email Routing passes emails (like Resend's email-open reports) to the intake program. Who can see it: Cloudflare Access: a sign-in in front of every page.">
+<img src="images/ops-cloudflare.png" width="100%" alt="Everything runs on Cloudflare, one account and one bill. One vendor and one command-line tool keep a multi-product platform simple for a small team. The domain: tbot.trade and its DNS records. The two small programs: Cloudflare Workers: one takes events in, one serves the dashboard's data. The database: Cloudflare D1, a small SQL database at the edge. The dashboard itself: Cloudflare Pages, a plain static site. Email in and out: Cloudflare Email Routing passes support emails to the intake program; Cloudflare Email Sending sends the mail out. Who can see it: Cloudflare Access: a sign-in in front of every page.">
 
 <details><summary>The services as a table</summary>
 
@@ -68,7 +74,7 @@ Events are never updated, never deleted. Corrections are new events. Total sourc
 | Edge routing | Workers (ingest, read-api) |
 | Database | D1 (SQLite at the edge) |
 | Static site | Pages (the dashboard itself) |
-| Webhooks in | Email Routing → ingest worker (e.g. Resend opens) |
+| Webhooks in | Email Routing → ingest worker (support email) |
 | Auth | Cloudflare Access |
 
 </details>
@@ -87,13 +93,13 @@ Events are never updated, never deleted. Corrections are new events. Total sourc
 - **Workers:** TypeScript, with every incoming event checked against a fixed format (Zod)
 - **D1:** Single migration (`0001_events.sql`), never altered in production
 - **Pages:** vanilla HTML/CSS/JS (no framework — render is fast and the markup is auditable)
-- **Email webhook bridges:** Cloudflare Email Routing → custom address → Worker that parses Resend digest emails into events
+- **Email webhook bridges:** Cloudflare Email Routing → custom address → Worker that turns each support email into an event and forwards it to Gmail
 - **Local dev:** `wrangler dev` for both workers; `pnpm db:migrate:local` mirrors prod schema; dev secrets in `.dev.vars`
 
 ## What was hard
 
 - **Event-shape ambiguity across products.** "What counts as a lead?" was different per product. Solved by keeping the `event_type` enum small (~6 values) and pushing all per-product specifics into the `metadata` JSON.
-- **Deduplication of webhook deliveries.** Resend, Stripe and the internal products all retry. Solved with the `(project, source_id)` unique index — duplicate POSTs are silent no-ops.
+- **Deduplication of webhook deliveries.** Stripe and the internal products both retry. Solved with the `(project, source_id)` unique index — duplicate POSTs are silent no-ops.
 - **One database, many consumers.** Solved by splitting write (ingest) and read (read-api) into separate workers with different D1 bindings. The read-api can be rate-limited or cached aggressively without affecting ingestion.
 
 ## Security operations on the same event store
